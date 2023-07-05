@@ -1,6 +1,6 @@
 import { Inter } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
-import ModalProvider from '@/providers/ModalProvider'
+import { ModalProvider } from '@/providers/ModalProvider'
 import ToastProvider from '@/providers/ToastProvider'
 
 import './globals.css'
