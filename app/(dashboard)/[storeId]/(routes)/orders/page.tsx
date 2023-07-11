@@ -1,40 +1,50 @@
 import { format } from "date-fns";
 
 import prismadb from "@/lib/prismadb"
-import CategoryClient from "./components/CategoryClient"
-import { CategoryColumn } from "./components/Columns";
+import { OrderClient } from "./components/OrderClient"
+import { OrderColumn } from "./components/Columns";
+import { formatter } from "@/lib/utils";
 
-const CategoriesPage = async ({
+const OrdersPage = async ({
   params
 }: {
   params: { storeId: string }
 }) => {
-  const categories = await prismadb.category.findMany({
+  const orders = await prismadb.order.findMany({
     where: {
       storeId: params.storeId
     },
     include: {
-      billboard: true,
+      orderItems: {
+        include: {
+          product: true
+        }
+      },
     },
     orderBy: {
       createdAt: 'desc'
     }
   });
 
-  const formatedCategories: CategoryColumn[] = categories.map((item) => ({
+  const formatedOrders: OrderColumn[] = orders.map((item) => ({
     id: item.id,
-    name: item.name,
-    billboardLabel: item.billboard.label,
+    phone: item.phone,
+    address: item.address,
+    products: item.orderItems.map((orderItem) => orderItem.product.name).join(', '),
+    totalPrice: formatter.format(item.orderItems.reduce((total, item) => {
+      return total + Number(item.product.price)
+    }, 0)),
+    isPaid: item.isPaid,
     createdAt: format(item.createdAt, 'MMMM do, yyyy')
   }))
 
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
-        <CategoryClient data={formatedCategories} />
+        <OrderClient data={formatedOrders} />
       </div>
     </div>
   )
 }
 
-export default CategoriesPage
+export default OrdersPage
