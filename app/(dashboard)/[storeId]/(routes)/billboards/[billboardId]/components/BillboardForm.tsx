@@ -16,7 +16,6 @@ import { toast } from "react-hot-toast"
 import axios from "axios"
 import { useParams, useRouter } from "next/navigation"
 import { AlertModal } from "@/components/modals/alert-moda"
-import { useOrigin } from "@/hooks/useOrigin"
 import ImageUpload from "@/components/ui/image-upload"
 
 const formSchema = z.object({
@@ -35,7 +34,6 @@ const BillboardForm: React.FC<BillboardFormProps> = ({
 }) => {
   const params = useParams();
   const router = useRouter();
-  const origin = useOrigin();
 
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -76,7 +74,7 @@ const BillboardForm: React.FC<BillboardFormProps> = ({
       setIsLoading(true);
       await axios.delete(`/api/${params.storeId}/billboards/${params.billboardId}`);
       router.refresh();
-      router.push("/");
+      router.push(`/${params.storeId}/billboards`);
       toast.success("Billboard deleted.")
     } catch (error) {
       toast.error("Make sure you removed all categories using this billboard!");
@@ -150,7 +148,6 @@ const BillboardForm: React.FC<BillboardFormProps> = ({
           <Button disabled={isLoading} className="ml-auto" type="submit">{action}</Button>
         </form>
       </Form>
-      <Separator />
     </>
   )
 }
